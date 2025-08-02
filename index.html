@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tushar Ramoliya - Lead iOS Engineer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Slate, Zinc, Stone) -->
+    <!-- Application Structure Plan: A single-page application with a top navigation bar for quick scrolling. The structure includes: 1. A Hero section for immediate impact. 2. An interactive Skills section with charts for visual engagement. 3. A vertical Timeline for career history, allowing users to expand details for each role, preventing information overload. 4. A filterable Project Portfolio, which is the core interactive element, enabling recruiters to instantly view experience by technology (e.g., Swift, Flutter). This structure is chosen to guide the user from a high-level summary to deep, specific details in an intuitive and engaging manner. -->
+    <!-- Visualization & Content Choices: 
+        - Skills: Report Info -> Technical Skills. Goal -> Inform/Compare. Viz -> Grouped lists and a horizontal bar chart. Interaction -> Hover effects. Justification -> More engaging than a list, provides quick visual comparison. Library -> Chart.js.
+        - Career Journey: Report Info -> Professional Experience. Goal -> Show Change/Organize. Viz -> Interactive vertical timeline. Interaction -> Click to expand details. Justification -> Manages information density and creates an exploratory user flow. Library -> Vanilla JS.
+        - Project Portfolio: Report Info -> Projects listed across roles. Goal -> Organize/Compare. Viz -> Filterable card grid. Interaction -> Click buttons to filter by technology. Justification -> Directly serves the primary user (recruiter) task of finding relevant project experience quickly. Library -> Vanilla JS.
+        - Career Progression: Report Info -> Job Titles/Dates. Goal -> Show Change. Viz -> Line chart. Interaction -> Tooltips on hover. Justification -> Provides a quick, high-level visualization of career growth. Library -> Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #475569; /* slate-600 */
+            border: 3px solid #f1f5f9; /* slate-100 */
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #0f172a; /* slate-900 */
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #4f46e5; /* indigo-600 */
+        }
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-slate-800">Tushar Ramoliya</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#skills" class="nav-link text-slate-600 font-medium">Skills</a>
+                <a href="#experience" class="nav-link text-slate-600 font-medium">Experience</a>
+                <a href="#portfolio" class="nav-link text-slate-600 font-medium">Portfolio</a>
+                <a href="#contact" class="nav-link text-slate-600 font-medium">Contact</a>
+            </div>
+            <div class="md:hidden">
+                <!-- Mobile menu button can be added here -->
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <!-- Hero Section -->
+        <section id="hero" class="text-center py-16">
+            <h2 class="text-4xl md:text-6xl font-extrabold text-slate-900 leading-tight">Lead iOS Engineer</h2>
+            <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">Architecting and developing high-impact mobile applications for iOS and Flutter with over 11 years of experience.</p>
+            <div class="mt-8 flex justify-center space-x-4">
+                <a href="https://www.linkedin.com/in/tushar-ramoliya-50110983/" target="_blank" class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
+                    LinkedIn Profile
+                </a>
+                <a href="#portfolio" class="bg-white text-slate-700 font-semibold px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50 transition-transform transform hover:scale-105">
+                    View My Work
+                </a>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-20">
+            <h3 class="section-title">Technical Skills</h3>
+            <p class="text-center text-slate-600 max-w-2xl mx-auto mb-12">This section provides a visual overview of my technical capabilities. The chart highlights my primary languages, and the lists below detail the frameworks, tools, and architectural patterns I use to build robust and scalable applications.</p>
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                <div class="chart-container mb-12">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-slate-700">
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-slate-800">Platforms & Languages</h4>
+                        <ul class="space-y-2 list-disc list-inside">
+                            <li>iOS, watchOS, tvOS, Android</li>
+                            <li>Swift, SwiftUI, Objective-C</li>
+                            <li>Dart</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-slate-800">Frameworks & SDKs</h4>
+                        <ul class="space-y-2 list-disc list-inside">
+                            <li>Flutter, Combine, Core Data</li>
+                            <li>CoreLocation, Firebase</li>
+                            <li>AWS Amplify, Apollo GraphQL</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-slate-800">Architecture & Tools</h4>
+                        <ul class="space-y-2 list-disc list-inside">
+                            <li>MVVM, Clean Architecture, SOLID</li>
+                            <li>Git, Bitbucket, CircleCI, Fastlane</li>
+                            <li>Jira, Contentful</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="py-20">
+            <h3 class="section-title">Career Journey</h3>
+            <p class="text-center text-slate-600 max-w-2xl mx-auto mb-12">My professional experience is a story of growth and leadership. This interactive timeline outlines my journey, from my early days as a developer to my current role as a Lead Engineer. Click on each role to see the key responsibilities and accomplishments from that period.</p>
+            <div class="relative max-w-3xl mx-auto pl-8 border-l-2 border-slate-300">
+                <!-- Timeline items will be injected here by JS -->
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="py-20">
+            <h3 class="section-title">Project Portfolio</h3>
+            <p class="text-center text-slate-600 max-w-2xl mx-auto mb-12">Here is a selection of projects I've led or significantly contributed to. Use the filters to explore projects based on the technologies used. This demonstrates my hands-on experience in building diverse applications, from e-commerce and IoT to AI-driven social platforms.</p>
+            <div class="flex justify-center flex-wrap gap-3 mb-12">
+                <button class="filter-btn active bg-slate-200 text-slate-800 font-medium py-2 px-5 rounded-full" data-filter="all">All</button>
+                <button class="filter-btn bg-slate-200 text-slate-800 font-medium py-2 px-5 rounded-full" data-filter="swift">Swift/iOS</button>
+                <button class="filter-btn bg-slate-200 text-slate-800 font-medium py-2 px-5 rounded-full" data-filter="flutter">Flutter</button>
+            </div>
+            <div id="portfolio-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Portfolio items will be injected here by JS -->
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-slate-100 rounded-2xl">
+            <div class="text-center">
+                <h3 class="section-title">Let's Connect</h3>
+                <p class="text-slate-600 max-w-xl mx-auto mb-8">I'm always open to discussing new opportunities and challenges. Feel free to reach out.</p>
+                <p class="text-lg font-medium text-slate-800">ramoliyatushar58@gmail.com</p>
+                <p class="text-lg text-slate-600">+91 8000280022</p>
+                <div class="mt-6">
+                    <a href="https://www.linkedin.com/in/tushar-ramoliya-50110983/" target="_blank" class="text-indigo-600 hover:underline font-semibold">
+                        View my LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Data for charts and dynamic content
+            const experienceData = [
+                {
+                    company: "Tech Holding",
+                    role: "Lead Software Engineer (iOS)",
+                    duration: "Oct 2020 – Present",
+                    details: [
+                        "Led ground-up development and architecture for major client applications like Digital Cookie (Girl Scouts) and Westfield.",
+                        "Directed the full native iOS application development for Theragun (Therabody), implementing complex Bluetooth (BLE) features.",
+                        "Contributed to the development of Wunderland (Flutter), an exclusive community app featuring empathic AI companions.",
+                        "Developed and launched the Weather Wear application using Flutter, a trip-planning tool with weather-based clothing suggestions."
+                    ]
+                },
+                {
+                    company: "Ecosmob Technology Pvt. Ltd.",
+                    role: "Team Lead (Mobile Application)",
+                    duration: "July 2019 – Sept 2020",
+                    details: [
+                        "Managed a team of 8 mobile developers, overseeing the full development lifecycle using Agile and Kanban.",
+                        "Led development of over 10 white-label VOIP apps (e.g., Connect Mobile, Digisol) and the Loyaltyxpert customer loyalty platform in Flutter."
+                    ]
+                },
+                {
+                    company: "Ashtech Softwares",
+                    role: "Senior iOS Developer",
+                    duration: "April 2017 – June 2019",
+                    details: [
+                        "Developed and maintained multiple iOS applications using Swift, including BAI SATARA, Lion District, MMSA, and others.",
+                        "Contributed to new feature development and performance optimization across the application portfolio."
+                    ]
+                },
+                {
+                    company: "Drashti Tradelink Pvt. Ltd.",
+                    role: "Senior iOS Developer",
+                    duration: "Aug 2016 – April 2017",
+                    details: [
+                        "Developed the iFirst rewards-based application, allowing users to earn points via ads for utility payments.",
+                        "Engineered the Seguro residence management application, a security solution for visitor and resident tracking."
+                    ]
+                },
+                {
+                    company: "AppMobiTech",
+                    role: "iOS Developer",
+                    duration: "Aug 2014 – July 2016",
+                    details: [
+                        "Contributed to foundational iOS applications including Wholetex, Wishbook, Praying Works, and Vintage Studio Appointment.",
+                        "Practiced test-driven development (TDD) in an Objective-C and Swift environment."
+                    ]
+                }
+            ];
+
+            const portfolioData = [
+                { name: "Wunderland", desc: "Exclusive community app with AI companions and secure chat.", tech: "Flutter", category: "flutter" },
+                { name: "Weather Wear", desc: "Trip planner suggesting clothing based on weather forecasts.", tech: "Flutter", category: "flutter" },
+                { name: "Loyaltyxpert", desc: "A comprehensive customer loyalty and rewards platform.", tech: "Flutter", category: "flutter" },
+                { name: "Theragun (Therabody)", desc: "Native iOS app for controlling BLE-enabled wellness devices.", tech: "Swift/iOS", category: "swift" },
+                { name: "Westfield", desc: "Shopping mall companion app with interactive maps and offers.", tech: "Swift/iOS", category: "swift" },
+                { name: "Digital Cookie", desc: "E-commerce platform for the Girl Scouts Cookie Program.", tech: "Swift/iOS", category: "swift" },
+                { name: "Seguro", desc: "A high-tech security solution for residence visitor management.", tech: "Swift/iOS", category: "swift" },
+                { name: "iFirst", desc: "Rewards-based app for earning points and paying utility bills.", tech: "Swift/iOS", category: "swift" },
+            ];
+
+            // Skills Chart
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Swift/SwiftUI', 'Flutter/Dart', 'Objective-C', 'JavaScript', 'SQL'],
+                    datasets: [{
+                        label: 'Years of Experience',
+                        data: [9, 5, 10, 3, 7],
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(30, 64, 175, 0.8)',
+                            'rgba(55, 65, 81, 0.8)',
+                            'rgba(219, 39, 119, 0.8)',
+                            'rgba(13, 148, 136, 0.8)',
+                        ],
+                        borderColor: [
+                            'rgba(79, 70, 229, 1)',
+                            'rgba(30, 64, 175, 1)',
+                            'rgba(55, 65, 81, 1)',
+                            'rgba(219, 39, 119, 1)',
+                            'rgba(13, 148, 136, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Primary Language Proficiency',
+                            font: { size: 16, weight: '600' },
+                            color: '#1e293b',
+                            padding: { bottom: 20 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        y: {
+                           grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Populate Experience Timeline
+            const timelineContainer = document.querySelector('#experience .relative');
+            experienceData.forEach(item => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item mb-12 relative';
+                timelineItem.innerHTML = `
+                    <div class="cursor-pointer">
+                        <h4 class="text-xl font-bold text-slate-800">${item.role}</h4>
+                        <p class="font-semibold text-indigo-600">${item.company}</p>
+                        <p class="text-sm text-slate-500">${item.duration}</p>
+                    </div>
+                    <div class="details hidden mt-4 pl-4 border-l-2 border-slate-200">
+                        <ul class="space-y-2 list-disc list-inside text-slate-600">
+                            ${item.details.map(detail => `<li>${detail}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                timelineContainer.appendChild(timelineItem);
+
+                timelineItem.querySelector('.cursor-pointer').addEventListener('click', () => {
+                    timelineItem.querySelector('.details').classList.toggle('hidden');
+                });
+            });
+
+            // Portfolio Filtering
+            const portfolioGrid = document.getElementById('portfolio-grid');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            function populatePortfolio(filter = 'all') {
+                portfolioGrid.innerHTML = '';
+                const filteredData = filter === 'all' ? portfolioData : portfolioData.filter(p => p.category === filter);
+                
+                filteredData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'portfolio-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300';
+                    card.innerHTML = `
+                        <div class="p-6">
+                            <div class="uppercase tracking-wide text-sm text-indigo-600 font-semibold">${item.tech}</div>
+                            <h5 class="block mt-1 text-lg leading-tight font-bold text-black">${item.name}</h5>
+                            <p class="mt-2 text-slate-600">${item.desc}</p>
+                        </div>
+                    `;
+                    portfolioGrid.appendChild(card);
+                });
+            }
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active', 'bg-indigo-600', 'text-white'));
+                    button.classList.add('active', 'bg-indigo-600', 'text-white');
+                    populatePortfolio(button.dataset.filter);
+                });
+            });
+
+            // Initial population
+            populatePortfolio();
+
+            // Smooth scrolling for nav links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
